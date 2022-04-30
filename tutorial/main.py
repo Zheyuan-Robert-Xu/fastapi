@@ -19,6 +19,9 @@ async def root():
 async def read_item(item_id: int):
     return {"item_id": item_id}
 
+# Because path operations are evaluated in order, you need to make sure that the path
+# for /users/me is declared before the one for /users/{user_id}
+
 
 @app.get("/users/me")
 async def read_user_me():
@@ -39,3 +42,10 @@ async def get_model(model_name: ModelName):
         return {"model_name": model_name, "message": "LeCNN all the images"}
 
     return {"model_name": model_name, "message": "Have some residuals"}
+
+# /files//home/johndoe/myfile.txt, with a double slash (//) between files and home
+
+
+@app.get("/files/{file_path:path}")
+async def read_file(file_path: str):
+    return {"file_path": file_path}
