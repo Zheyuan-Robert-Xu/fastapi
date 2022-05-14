@@ -25,8 +25,8 @@ async def root():
 
 
 @app.get("/items/{item_id}")
-async def read_user_item(item_id: str, needy: str):
-    item = {"item_id": item_id, "needy": needy}
+async def read_user_item(item_id: str, needy: str, skip: int = 0, limit: int | None = None):
+    item = {"item_id": item_id, 'needy': needy, 'skip': skip, 'limit': limit}
     return item
 
 
@@ -46,7 +46,7 @@ async def read_user(user_id: str):
 
 @app.get("/users/{user_id}/items/{item_id}")
 async def read_user_item(
-    user_id: int, item_id: str, q: Optional[str] = None, short: bool = False
+    user_id: int, item_id: str, q: str | None = None, short: bool = False
 ):
     item = {"item_id": item_id, "owner_id": user_id}
     if q:
