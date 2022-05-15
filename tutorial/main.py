@@ -1,7 +1,7 @@
 from typing import Optional
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Required
 app = FastAPI()
 
 fake_items_db = [{"item_name": "Foo"}, {
@@ -30,8 +30,13 @@ async def create_item(item_id: int, item: Item, q: str | None = None):
 
 
 @app.get("/items/")
-async def read_item(skip: int = 0, limit: int = 10):
-    return fake_items_db[skip: skip + limit]
+async def read_items(
+    hidden_query: str | None = Query(default=None, include_in_schema=False)
+):
+    if hidden_query:
+        return {"hidden_query": hidden_query}
+    else:
+        return {"hidden_query": "Not found"}
 
 
 @app.post("/items/")
