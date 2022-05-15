@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import FastAPI
 from enum import Enum
-
+from pydantic import BaseModel
 app = FastAPI()
 
 fake_items_db = [{"item_name": "Foo"}, {
@@ -14,9 +14,33 @@ class ModelName(str, Enum):
     lenet = "lenet"
 
 
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+
+
+@app.put("/items/{item_id}")
+async def create_item(item_id: int, item: Item, q: str | None = None):
+    result = {"item_id": item_id, **item.dict()}
+    if q:
+        result.update({"q": q})
+    return result
+
+
 @app.get("/items/")
 async def read_item(skip: int = 0, limit: int = 10):
     return fake_items_db[skip: skip + limit]
+
+
+@app.post("/items/")
+async def create_item(item: Item):
+    item_dict = item.dict()
+    if item.tax:
+        price_with_tax = item.price + item.tax
+        item_dict.update({"price_with_tax": price_with_tax})
+    return item_dict
 
 
 @app.get("/")
