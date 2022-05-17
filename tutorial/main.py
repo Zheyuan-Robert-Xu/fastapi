@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Path, Query
 from enum import Enum
 from pydantic import BaseModel, Required
 app = FastAPI()
@@ -54,9 +54,11 @@ async def root():
 
 
 @app.get("/items/{item_id}")
-async def read_user_item(item_id: str, needy: str, skip: int = 0, limit: int | None = None):
-    item = {"item_id": item_id, 'needy': needy, 'skip': skip, 'limit': limit}
-    return item
+async def read_items(*, item_id: int = Path(title='The ID of the item to get', gt=0, le=1000, default=None), size: float = Query(gt=0, lt=10.5, default=None), q: str):
+    results = {'item_id': item_id}
+    if q:
+        results.update({"q": q, "size": size})
+    return results
 
 
 # Because path operations are evaluated in order, you need to make sure that the path
